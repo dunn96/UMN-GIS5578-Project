@@ -34,4 +34,37 @@ water2014 = water2014.drop(["LOCATION", "ACRES", "CAT", "AFFECTED_U", "NOPLN", "
                             "HgF", "HgW", "Nutrients", "PCBF", "PFOS_W", "SHAPE_Leng", "Shape_Le_1", "Shape_Area"], axis = 1)
 
 # Renaming the water_name column to match the two other datasets
+water2018.rename(columns = {"IMP_PARAM" : "IMPAIR_PAR"})
 water2014.rename(columns = {"WATER_NAME" : "NAME"})
+
+
+# Loading the draft 2020 impaired water list
+water2020 = gpd.read_file("wq-iw1-65.csv")
+
+# retreiving all the column names
+for col in water2020.columns:
+    print(col)
+
+# Sampling the data, to get a look at what we are dealing with
+water2020.head()
+
+# Selecting out the columns we want to keep
+water2020 = water2020[["Water body name", "AUID", "Water body type", "Use Class", "Pollutant or stressor", "geometry"]]
+water2020.head()
+
+# Selecting out only the lake features to keep in line with the 3 other shapefiles we are already working with
+water2020_lake = water2020.loc[(test["Water body type"] == "Lake")]
+
+# Removing duplicate records --> grouping by AUID, and joining the polluatant or stressor field with ";" when they differ
+# for the repeated AUID. This happens because a lake can have more than one stressor to get on the impaired water list.
+water2020_remove_duplicates = water2020_lake.groupby("AUID", as_index = False)["Pollutant or stressor"].apply(";".join)
+water2020_remove_duplicates
+
+# Failed attempt to join the other needed columns back to the dataset after removing the duplicates
+jointest1 = water2020_remove_duplicates.merge(water2020_lake, how = "inner", on = "AUID")
+jointest1
+
+# Attempt to get geometry for the 2020 dataset from the 2018 dataset
+# Have not figured out the best way to do this yet. 
+jointest2 = water2020_remove_duplicates.merge(water2018, on = "AUID")
+jointest2
