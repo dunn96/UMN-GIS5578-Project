@@ -5,6 +5,7 @@ import pandas as pd
 # Directory of unzipped safegraph csv.gz files
 pathway = r'C:\Users\msong\Desktop\2019_safegraph2'
 
+# Extract data for MN and output csv for each dataset. 
 for file in glob.glob(pathway + "\*.csv.gz"):
     with gzip.open(file, 'r') as data:
         reader = pd.read_csv(data)
@@ -47,20 +48,25 @@ def monthly(directory, month):
             pass      
     final_df = pd.concat(df_list)
     final_df.to_csv(f'{month}.csv', index=False)
-    print(f'{file[-23:-18]} data are combined')
+    print(f'{month} data are combined')
     
 
 # Combine January 2020 data 
 # [Having trouble turning looping through months in year2020
 # and placing month parameter into monthly function]
 
-directory = r'F:\GIS Programming\2020_safegraph_all'
+directory = r'F:\GIS Programming\2019_safegraph_all'
 
-year2020 = ['jan20', 'feb20', 'mar20', 
-         'apr20', 'may20', 'jun20', 
-         'jul20', 'aug20', 'sep20', 
-         'oct20', 'nov20', 'dec20']
+# create list of all months in year
+year2020 = []
 
-month = "jan20"
-monthly(directory, month)
+for file in glob.glob(directory + "\*.csv"):
+    year2020.append(file[-23:-18])
 
+year2020 = list(set(year2020)) # remove duplicates in list
+
+
+# combine all monthly data for all months per year
+for month in year2020:
+    month = month
+    monthly(directory, month)
