@@ -4,20 +4,24 @@ import csv
 import geopandas as gpd
 import pandas as pd
 
-inFile = 'jan19patterns-part1.csv.gz'
+# Directory of unzipped safegraph csv.gz files
+pathway = r'C:\Users\msong\Desktop\2019_safegraph2'
 
-# Obtain fieldnames from file
-inFile = 'jan19patterns-part1.csv.gz'
-
-with gzip.open(inFile, 'rt') as jan19:
-    reader = pd.read_csv(jan19)
+for file in glob.glob(pathway + "\*.csv.gz"):
+    with gzip.open(file, 'r') as data:
+        reader = pd.read_csv(data)
     
-    # Extract list of column names and create new data frame with fields of interest
-    all_col = []
-    for col in reader.head():
-        all_col.append(col)
-    ex_col = all_col[:11] # fields of interest are first 12 fields
-    df = reader.filter(ex_col)
+        # Extract list of column names and create new data frame with fields of interest
+        all_col = []
+        for col in reader.head():
+            all_col.append(col)
+        ex_col = all_col[:11] # fields of interest are first 12 fields
+        df = reader.filter(ex_col)
  
-# Filter for data in MN
-mn_df = df.loc[df['region'] == 'MN']
+        # Filter for MN data
+        mn_df = df.loc[df['region'] == 'MN']
+
+        # write to csv file
+        outname = file
+        mn_df.to_csv(f'{outname[:-7]}.csv', index=False)
+    
