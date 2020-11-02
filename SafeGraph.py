@@ -1,7 +1,5 @@
 import gzip
 import glob
-import csv
-import geopandas as gpd
 import pandas as pd
 
 # Directory of unzipped safegraph csv.gz files
@@ -15,7 +13,9 @@ for file in glob.glob(pathway + "\*.csv.gz"):
         all_col = []
         for col in reader.head():
             all_col.append(col)
-        ex_col = all_col[:11] # fields of interest are first 12 fields
+        
+        # fields of interest are first 12 fields for 2019, first 14 fields for 2020
+        ex_col = all_col[:11] 
         df = reader.filter(ex_col)
  
         # Filter for MN data
