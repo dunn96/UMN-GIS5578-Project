@@ -24,4 +24,43 @@ for file in glob.glob(pathway + "\*.csv.gz"):
         # write to csv file
         outname = file
         mn_df.to_csv(f'{outname[:-7]}.csv', index=False)
+        
+
+
+def monthly(directory, month):
+    """combine all data for each month into one csv
     
+    Parameters
+    ----------
+    directory: str
+        Directory of .csv files created from line 26
+    month: str
+        First three characters of month and last two digits of year (i.e. jan20) for data to be combined 
+    """
+    
+    df_list = []
+    for file in glob.glob(directory + "\*.csv"):
+        if f'{file[-23:-18]}' == month:
+            reader = pd.read_csv(file)
+            df_list.append(reader)
+        else:
+            pass      
+    final_df = pd.concat(df_list)
+    final_df.to_csv(f'{month}.csv', index=False)
+    print(f'{file[-23:-18]} data are combined')
+    
+
+# Combine January 2020 data 
+# [Having trouble turning looping through months in year2020
+# and placing month parameter into monthly function]
+
+directory = r'F:\GIS Programming\2020_safegraph_all'
+
+year2020 = ['jan20', 'feb20', 'mar20', 
+         'apr20', 'may20', 'jun20', 
+         'jul20', 'aug20', 'sep20', 
+         'oct20', 'nov20', 'dec20']
+
+month = "jan20"
+monthly(directory, month)
+
