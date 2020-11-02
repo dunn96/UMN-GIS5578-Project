@@ -68,3 +68,21 @@ jointest1
 # Have not figured out the best way to do this yet. 
 jointest2 = water2020_remove_duplicates.merge(water2018, on = "AUID")
 jointest2
+
+
+# Loading block group data
+blockgroups_df = gpd.read_file('zip://tl_2019_27_bg.zip')
+print(f'Loaded {len(blockgroups_df):,} block groups')
+
+# Checking the projections of the blockgroups and the water layers
+print(blockgroups_df.crs)
+print(water2018.crs)
+
+# Reprojecting the blockgroups to match the water
+bg_proj = blockgroups_df.to_crs('EPSG:26915')
+bg_proj.plot()
+
+# Intersecting the water 2018 layer with the blockgroups to have the blockgroup ids for each lake.
+water2018_intersect_bg_proj = gpd.overlay(water2018, bg_proj, how='intersection')
+water2018_intersect_bg_proj.plot()
+water2018_intersect_bg_proj.head()
