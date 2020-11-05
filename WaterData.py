@@ -2,6 +2,8 @@ import pandas as pd
 import geopandas as gpd
 
 water2018 = gpd.read_file("zip://impaired_2018_lakes.zip")
+water2016 = gpd.read_file("zip://impaired_2016_lakes.zip")
+water2014 = gpd.read_file("zip://impaired_2014_lakes.zip")
 
 water2018.plot()
 water2018.head()
