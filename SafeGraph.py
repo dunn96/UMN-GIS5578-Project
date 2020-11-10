@@ -1,7 +1,7 @@
 import gzip
 import glob
 import pandas as pd
-import csv
+import zipfile
 
 # Directory of unzipped safegraph csv.gz files
 pathway = r'C:\Users\msong\Desktop\2019_safegraph2'
@@ -30,10 +30,10 @@ for file in glob.glob(pathway + "\*.csv.gz"):
 
 ###############
 #
-# aggregrate data by month
+# Aggregrate safegraph data by month
 #
 def monthly(directory, month):
-    """combine all data for each month into one csv
+    """combine all safe graph data for each month into one csv
     
     Parameters
     ----------
@@ -74,9 +74,10 @@ for month in year2020:
 
     
     
-# Focus safegraph data on seven county metropolitan area
+    
+# Reduce statewide safegraph data to seven county metropolitan area MN
 #
-metro_dir = r'C:\Users\msong\Desktop\alldata'
+metro_files = r'C:\Users\msong\Desktop\alldata'
 paths = []
 dbf = r'C:\Users\msong\Desktop\shp_bdry_metro_counties_and_ctus\CountiesAndCTUs.dbf'
 
@@ -89,8 +90,40 @@ for row in cur:
     
 # Reduce monthly safegraph data to cities in the metro
 out_path = r'C:\Users\msong\Desktop\metro'
-for file in glob.glob(metro_dir + "\*.csv"):
+for file in glob.glob(metro_files + "\*.csv"):
     with open(file) as data: 
         reader = pd.read_csv(data)
         metro_df = reader.loc[reader['city'].isin(metro_cities)]
         metro_df.to_csv(f'{out_path}/{file[-9:-4]}_metro.csv', index=False)
+        
+        
+        
+        
+# Geocode SafeGraph POI in metro. Outpoint point features .shp files for each month.
+# Uses arcpy and Esri Business Anaylst US data geocoder
+#
+
+inpath = r'C:\Users\leex6165\Desktop\metro'
+geocoder = r'\\files.umn.edu\us\gis\U-Spatial\UMN_Users\data\Esri Data\Esri BA USA 2019 geocoding data\USA.loc'
+address_fields = 'Address street_address VISIBLE NONE;City city VISIBLE NONE;Region region VISIBLE NONE;Postal postal_code VISIBLE NONE'
+outpath = r'C:\Users\leex6165\Desktop\geocoded'
+
+
+# Get full path of each metro csv 
+tables = []
+for file in glob.glob(f'{inpath}\*.csv'):
+    tables.append(file)
+    
+
+# Geocode safegraph poi into points based on multiple fields
+# Output is in format: monYY_metro.shp i.e. jan19_metro.shp
+for table in tables:
+    arcpy.geocoding.GeocodeAddresses(table, 
+                                     geocoder, 
+                                     address_fields, 
+                                     f'{outpath}\\{table[32:-4]}.shp', 
+                                     "STATIC", 
+                                     None, 
+                                     '', 
+                                     None)
+    
