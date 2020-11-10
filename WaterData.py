@@ -97,3 +97,18 @@ water2020_lake = water2020_lake[["AUID", "Water body name", "County", "geometry"
 
 # Renaming the columns to match the two other datasets
 water2020_lake = water2020_lake.rename(columns = {"Water body name" : "NAME", "County" : "COUNTY"})
+
+# Selecting out the 7 county metro
+water2020_metro = water2020_lake.loc[(water2020_lake["COUNTY"] == "Anoka")]
+water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Hennepin")])
+water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Ramsey")])
+water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Washington")])
+water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Carver")])
+water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Scott")])
+water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Dakota")])
+
+# Varifying all the correct counties are there
+water2020_metro["COUNTY"].unique()
+
+# Drop Duplicate AUIDs
+water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
