@@ -17,25 +17,12 @@ water2016 = gpd.read_file("zip://impaired_2016_lakes.zip")
 water2014 = gpd.read_file("zip://impaired_2014_lakes.zip")
 metro = gpd.read_file("zip://shp_bdry_metro_counties_and_ctus.zip")
 
+###
+### CLEANING AND CLIPPING IMPAIRED WATER 2014, 2016, AND 2018
+###
 
 # Cleaning the metro dataset, dissolving on the county name. 
 metro_dissolve = metro.dissolve(by = "CO_NAME")
-
-# There are many columns in this dataset,
-# this is to be able to see all of them to easily
-# choose the ones we will keep
-columns18 =[]
-columns16 =[]
-columns14 =[]
-
-for col in water2018.columns:
-    columns18.append(col)
-    
-for col in water2016.columns:
-    columns16.append(col)
-    
-for col in water2014.columns:
-    columns14.append(col)
 
 # Dropping all the unnecessary columns
 water2018 = water2018.drop(["CAT", "CAT_DESC", "REACH_DESC", "USE_CLASS", "AFFECTED_U", "LIKE_MEET", 
@@ -72,6 +59,33 @@ water2016_clip = gpd.clip(water2016_drop_invalid, metro_dissolve)
 water2014_proj = water2014_drop_invalid.to_crs('EPSG:26915')
 water2014_clip = gpd.clip(water2014_proj, metro_dissolve)
 
+# New field for impairment status in all data sets
+for df in dfs:
+    df["status"] = "Impaired"
+    
+# Creating a list of the gpdf to loop through and find the smallest lake size
+dfs = [water2014_clip, water2016_clip, water2018_clip]
+
+def find_min(dfs):
+    '''
+    finds smallest lake within the impaired datasets
+    Parameter: list of dataframes
+    '''
+    for df in dfs:
+        smallest_lake = df["AREA_ACRES"].min()
+        minimum = 0
+        if smallest_lake > minimum:
+            minimum = smallest_lake
+        else:
+            pass
+    return minimum
+
+# Calling function
+find_min(dfs)
+
+###
+### CLEANING THE HYDROGRAPHY DATA SET
+###
 
 # Locate all invalid gometries and drop them from the dataset
 hydro_drop_invalid = hydrography.loc[hydrography['geometry'].is_valid, :]
@@ -82,9 +96,22 @@ hydro_clip = gpd.clip(hydro_drop_invalid, metro_dissolve)
 # Narrowing down the number of features in the hydro layer to only lakes and ponds
 hydro_lake = hydro_clip.loc[hydro_clip["wb_class"] == "Lake or Pond"]
 
+# Selecting only the lakes that are at least the size of the the impaired water dataframes
+hydro_lake = hydro_lake.loc[(hydro_lake["acres"] >= minimum)]
 
+# Dropping all excess fields from the dataframe
+hydro_clean = hydro_lake.drop(["fw_id", "dowlknum", "sub_flag", "wb_class", "lake_class", "shore_mi", "center_utm", "center_u_1",
+                               "dnr_region", "fsh_office", "outside_mn", "delineated", "delineatio", "delineat_1", "delineat_2", 
+                               "approved_b", "approval_d", "approval_n", "has_flag", "flag_type", "publish_da", "lksdb_basi", "has_wld_fl",
+                               "wld_flag_t", "created_us", "created_da", "last_edite", "last_edi_1", "ow_use", "pwi_class", "map_displa", 
+                               "shape_Leng", "shape_Area", "INSIDE_X", "INSIDE_Y", "in_lakefin"], axis = 1)
 
+# New field for impairment status to be used when data is joined with the imparied data sets
+hydro_clean["status"] = ""
 
+###
+### CLEANING THE 2020 IMPAIRED WATER DATA SET
+###
 
 # Load water 2020 data csv, selecting out the columns that we want and addinga geometry column
 # and pulling out only the lake features.
@@ -99,16 +126,12 @@ water2020_lake = water2020_lake[["AUID", "Water body name", "County", "geometry"
 water2020_lake = water2020_lake.rename(columns = {"Water body name" : "NAME", "County" : "COUNTY"})
 
 # Selecting out the 7 county metro
-water2020_metro = water2020_lake.loc[(water2020_lake["COUNTY"] == "Anoka")]
-water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Hennepin")])
-water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Ramsey")])
-water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Washington")])
-water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Carver")])
-water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Scott")])
-water2020_metro = water2020_metro.append(water2020_lake.loc[(water2020_lake["COUNTY"] == "Dakota")])
+counties = ["Anoka", "Hennepin", "Ramsey", "Washington", "Carver", "Scott", "Dakota"]
+water2020_metro = water2020_lake.loc[(water2020_lake["COUNTY"].isin(counties))]
 
 # Varifying all the correct counties are there
 water2020_metro["COUNTY"].unique()
 
 # Drop Duplicate AUIDs
 water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
+
