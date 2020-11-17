@@ -40,7 +40,7 @@ water2014 = water2014.drop(["LOCATION", "CAT", "AFFECTED_U", "NOPLN", "APPROVED"
                             "HgF", "HgW", "Nutrients", "PCBF", "PFOS_W", "SHAPE_Leng", "Shape_Le_1", "Shape_Area"], axis = 1)
 
 # Renaming the columns to match the two other datasets
-water2014 = water2014.rename(columns = {"WATER_NAME" : "NAME", "ALL_COUNTI" : "COUNTY", "ACRES" : "AERA_ACRES"})
+water2014 = water2014.rename(columns = {"WATER_NAME" : "NAME", "ALL_COUNTI" : "COUNTY", "ACRES" : "AREA_ACRES"})
 
 
 # Locate all invalid gometries and drop them from the dataset
@@ -59,26 +59,25 @@ water2016_clip = gpd.clip(water2016_drop_invalid, metro_dissolve)
 water2014_proj = water2014_drop_invalid.to_crs('EPSG:26915')
 water2014_clip = gpd.clip(water2014_proj, metro_dissolve)
 
+
+# Creating a list of the gpdf to loop through and find the smallest lake size
+dfs = [water2014_clip, water2016_clip, water2018_clip]
+
 # New field for impairment status in all data sets
 for df in dfs:
     df["status"] = "Impaired"
-    
-# Creating a list of the gpdf to loop through and find the smallest lake size
-dfs = [water2014_clip, water2016_clip, water2018_clip]
 
 def find_min(dfs):
     '''
     finds smallest lake within the impaired datasets
     Parameter: list of dataframes
     '''
+    global minimum
+    minimum = []
     for df in dfs:
         smallest_lake = df["AREA_ACRES"].min()
-        minimum = 0
-        if smallest_lake > minimum:
-            minimum = smallest_lake
-        else:
-            pass
-    return minimum
+        minimum.append(df["AREA_ACRES"].min())
+    minimum = min(minimum)
 
 # Calling function
 find_min(dfs)
