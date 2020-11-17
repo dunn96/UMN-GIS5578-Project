@@ -86,6 +86,7 @@ water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
 
 # Creating a list of the gpdf to loop through and find the smallest lake size
 dfs = [water2014_clip, water2016_clip, water2018_clip]
+dfs_names = ["water2014_clip", "water2016_clip", "water2018_clip"]
 
 # New field for impairment status in all data sets
 for df in dfs:
@@ -138,7 +139,7 @@ hydro_clean = hydro_clean.rename(columns={'pw_basin_n': 'NAME'})
 hydro_dis = (hydro_clean.dissolve(by='NAME')).reset_index()
 
 
-def complete_hydro(waterdata):
+def complete_hydro(waterdata, waterdata_name):
     '''
     [add doc]
     
@@ -166,11 +167,12 @@ def complete_hydro(waterdata):
     projected_dis['status_y'].fillna("nonimpaired")
     projected_df = projected_dis.rename(columns = {'status_y': 'status'})
 
-    projected_df.to_file(f'{waterdata}.shp')
+    projected_df.to_file(f'{waterdata_name}.shp')
 
 # Nonimpaired and impaired completed dataset for each year    
 for df in dfs:
-    complete_hydro(df)
+    for name in dfs_names:
+        complete_hydro(df, name)
 
     
 ###
@@ -178,19 +180,9 @@ for df in dfs:
 ### 
 
 water2020_join_auid = water2020_clean.merge(water2018_clip, how = "left", on = "AUID")
-water2020_join_auid
 
-hydro_clean = hydro_clean.rename(columns = {"pw_basin_n" : "NAME_x"})
+water2020_join_auid = water2020_join_auid[["AUID", "NAME_x", "COUNTY_x", "AREA_ACRES", "geometry_y", "status"]]
 
-hydro_geometry = hydro_clean.loc[hydro_clean["NAME_x"] == "DeMontreville"]
+water2020_join_auid = water2020_join_auid.rename(columns = {"NAME_x" : "NAME", "COUNTY_x" : "COUNTY", "geometry_y" : "geometry"})
 
-hydro_geometry = hydro_geometry[["NAME_x", "geometry", "status"]]
-
-water2020_join_name = water2020_join_auid.merge(hydro_geometry, how = "left", on = "NAME_x")
-
-hydro_geometry2 = hydro_clean.loc[hydro_clean["NAME_x"] == "Laura"]
-
-hydro_geometry2 = hydro_geometry2[["NAME_x", "geometry", "status"]]
-
-water2020_join_name2 = water2020_join_name.merge(hydro_geometry2, how = "left", on = "NAME_x")
-water2020_join_name2
+complete_hydro(water2020_join_auid, "water2020_clip")
