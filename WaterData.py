@@ -57,6 +57,32 @@ water2016_clip = gpd.clip(water2016_drop_invalid, metro_dissolve)
 water2014_proj = water2014_drop_invalid.to_crs('EPSG:26915')
 water2014_clip = gpd.clip(water2014_proj, metro_dissolve)
 
+###
+### CLEANING THE 2020 IMPAIRED WATER DATA SET
+###
+
+# Load water 2020 data csv, selecting out the columns that we want and addinga geometry column
+# and pulling out only the lake features.
+water2020 = gpd.read_file("wq-iw1-65.csv")
+water2020 = water2020[["Water body name", "AUID", "County", "Water body type", "geometry"]]
+water2020_lake = water2020.loc[(water2020["Water body type"] == "Lake")]
+
+# Dropping the "water body type" field since it is no longer needed
+water2020_lake = water2020_lake[["AUID", "Water body name", "County", "geometry"]]
+
+# Renaming the columns to match the two other datasets
+water2020_lake = water2020_lake.rename(columns = {"Water body name" : "NAME", "County" : "COUNTY"})
+
+# Selecting out the 7 county metro
+counties = ["Anoka", "Hennepin", "Ramsey", "Washington", "Carver", "Scott", "Dakota"]
+water2020_metro = water2020_lake.loc[(water2020_lake["COUNTY"].isin(counties))]
+
+# Varifying all the correct counties are there
+water2020_metro["COUNTY"].unique()
+
+# Drop Duplicate AUIDs
+water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
+
 
 # Creating a list of the gpdf to loop through and find the smallest lake size
 dfs = [water2014_clip, water2016_clip, water2018_clip]
@@ -70,14 +96,16 @@ def find_min(dfs):
     finds smallest lake within the impaired datasets
     Parameter: list of dataframes
     '''
+    
     global minimum
     minimum = []
     for df in dfs:
         minimum.append(df["AREA_ACRES"].min())
     minimum = min(minimum)
 
-# Calling function
+# Find smallest lake size of from all impaired lakes
 find_min(dfs)
+
 
 ###
 ### CLEANING THE HYDROGRAPHY DATA SET
@@ -105,32 +133,46 @@ hydro_clean = hydro_lake.drop(["fw_id", "dowlknum", "sub_flag", "wb_class", "lak
 # New field for impairment status to be used when data is joined with the imparied data sets
 hydro_clean["status"] = ""
 
-###
-### CLEANING THE 2020 IMPAIRED WATER DATA SET
-###
+# Dissolve hydrography geometry by lake name 
+hydro_clean = hydro_clean.rename(columns={'pw_basin_n': 'NAME'})
+hydro_dis = (hydro_clean.dissolve(by='NAME')).reset_index()
 
-# Load water 2020 data csv, selecting out the columns that we want and addinga geometry column
-# and pulling out only the lake features.
-water2020 = gpd.read_file("wq-iw1-65.csv")
-water2020 = water2020[["Water body name", "AUID", "County", "Water body type", "geometry"]]
-water2020_lake = water2020.loc[(water2020["Water body type"] == "Lake")]
 
-# Dropping the "water body type" field since it is no longer needed
-water2020_lake = water2020_lake[["AUID", "Water body name", "County", "geometry"]]
+def complete_hydro(waterdata):
+    '''
+    [add doc]
+    
+    '''
+    
+    # Combine nonimpaired with impaired. Returns a pandas dataframe
+    join_hydro = hydro_dis.merge(waterdata, on ='NAME', how='left') 
+    
+    # Set geometry to hydro_dis dataset for all features
+    projected = join_hydro.set_geometry(join_hydro['geometry_x'], 
+                                        crs='EPSG:26915')
+    
+    # Combine duplicate features
+    projected_dis = (projected.dissolve(by='NAME')).reset_index() 
+    
+    # Remove unneccessary fields
+    projected_dis = projected_dis[['NAME', 
+                                   'geometry', 
+                                   'acres', 
+                                   'cty_name', 
+                                   'unique_id', 
+                                   'status_y']]
+    
+    # Fill status of nonimpaired lakes
+    projected_dis['status_y'].fillna("nonimpaired")
+    projected_df = projected_dis.rename(columns = {'status_y': 'status'})
 
-# Renaming the columns to match the two other datasets
-water2020_lake = water2020_lake.rename(columns = {"Water body name" : "NAME", "County" : "COUNTY"})
+    projected_df.to_file(f'{waterdata}.shp')
 
-# Selecting out the 7 county metro
-counties = ["Anoka", "Hennepin", "Ramsey", "Washington", "Carver", "Scott", "Dakota"]
-water2020_metro = water2020_lake.loc[(water2020_lake["COUNTY"].isin(counties))]
+# Nonimpaired and impaired completed dataset for each year    
+for df in dfs:
+    complete_hydro(df)
 
-# Varifying all the correct counties are there
-water2020_metro["COUNTY"].unique()
-
-# Drop Duplicate AUIDs
-water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
-
+    
 ###
 ### JOINING GEOMETRY TO WATER2020_CLEAN
 ### 
