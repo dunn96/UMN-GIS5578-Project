@@ -1,6 +1,4 @@
 '''
-Author: Nicole Dunn
-
 This python script purpose is to clean spatial data files that will be used in 
 future analysis. Cleaning the data includes removing fields that are not needed, 
 removing invalid geometries from the geodataframes, adding geometery where there 
@@ -75,7 +73,6 @@ def find_min(dfs):
     global minimum
     minimum = []
     for df in dfs:
-        smallest_lake = df["AREA_ACRES"].min()
         minimum.append(df["AREA_ACRES"].min())
     minimum = min(minimum)
 
@@ -134,3 +131,24 @@ water2020_metro["COUNTY"].unique()
 # Drop Duplicate AUIDs
 water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
 
+###
+### JOINING GEOMETRY TO WATER2020_CLEAN
+### 
+
+water2020_join_auid = water2020_clean.merge(water2018_clip, how = "left", on = "AUID")
+water2020_join_auid
+
+hydro_clean = hydro_clean.rename(columns = {"pw_basin_n" : "NAME_x"})
+
+hydro_geometry = hydro_clean.loc[hydro_clean["NAME_x"] == "DeMontreville"]
+
+hydro_geometry = hydro_geometry[["NAME_x", "geometry", "status"]]
+
+water2020_join_name = water2020_join_auid.merge(hydro_geometry, how = "left", on = "NAME_x")
+
+hydro_geometry2 = hydro_clean.loc[hydro_clean["NAME_x"] == "Laura"]
+
+hydro_geometry2 = hydro_geometry2[["NAME_x", "geometry", "status"]]
+
+water2020_join_name2 = water2020_join_name.merge(hydro_geometry2, how = "left", on = "NAME_x")
+water2020_join_name2
