@@ -41,7 +41,7 @@ for file in glob.glob(pathway + "\*.csv.gz"): # search folder for all csv.gz fil
 
 
 def monthly(directory, month):
-    '''combine all safe graph data for each month into one csv
+    '''combine all SafeGraph data for each month into one csv
     
     Parameters
     ----------
@@ -59,7 +59,7 @@ def monthly(directory, month):
     
     df_list = []
     for file in glob.glob(pathway + "\*.csv"):
-        if f'{file[-23:-18]}' == month:
+        if f'{file[-23:-18]}' == month: # outputs monYY
             reader = pd.read_csv(file)
             df_list.append(reader)
         else:
