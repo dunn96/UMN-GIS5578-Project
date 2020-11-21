@@ -17,7 +17,7 @@ import pandas as pd
 pathway = r'C:\Users\msong\Desktop\2019_safegraph2'
 
 # Extract data for MN and output csv for each dataset. 
-for file in glob.glob(pathway + "\*.csv.gz"): # search folder for all csv.gz files
+for file in glob.glob(pathway + '\*.csv.gz'): # search folder for all csv.gz files
     with gzip.open(file, 'r') as data:
         reader = pd.read_csv(data)
     
@@ -57,7 +57,7 @@ def monthly(directory, month):
     '''
     
     df_list = []
-    for file in glob.glob(pathway + "\*.csv"):
+    for file in glob.glob(pathway + '\*.csv'):
         if f'{file[-23:-18]}' == month: # outputs monYY
             reader = pd.read_csv(file)
             df_list.append(reader)
@@ -70,7 +70,7 @@ def monthly(directory, month):
 # create list of all months in year
 directory = r'F:\GIS Programming\2019_safegraph_all'
 months = []
-for file in glob.glob(directory + "\*.csv"):
+for file in glob.glob(directory + '\*.csv'):
     months.append(file[-23:-18])
 months = list(set(months)) # remove duplicates in list
 
