@@ -12,6 +12,7 @@ This tool requires the arcpy module and the business analyst extension to use th
 import gzip
 import glob
 import pandas as pd
+import arcpy 
 
 # Directory of unzipped safegraph patterns csv.gz files
 pathway = r'C:\Users\msong\Desktop\2019_safegraph2'
