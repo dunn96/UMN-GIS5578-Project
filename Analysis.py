@@ -35,3 +35,44 @@ buffer2014 = buffer_lakes(buffer_size, water2014)
 buffer2016 = buffer_lakes(buffer_size, water2016)
 buffer2018 = buffer_lakes(buffer_size, water2018)
 buffer2020 = buffer_lakes(buffer_size, water2020)
+
+
+
+# Get all metro data by finding all files ending in _metro.zip
+directory = r'/home/leex6165/gisproj/'
+path = f'{directory}*19_metro.zip'
+
+buffer = buffer2018
+data_2018 = pd.DataFrame({'NAME': buffer['NAME'], 'STATUS': water2018['status']})
+
+# Get counts in each lake buffer per month for 2018 water data and 2019 foot traffic
+for file in glob.glob(path):
+    sg_data = f'zip://{file}'
+    patterns = (gpd.read_file(sg_data)).to_crs('EPSG:26915')
+    data_join = gpd.sjoin(buffer, patterns, op='intersects')
+
+    # Get counts of points in each lake buffer.
+    data_grp = data_join.groupby('NAME', as_index=False)['index_right'].count()
+    data_grp = data_grp.rename(columns = {'index_right': f'{file[-15:-10]}_counts'})
+    
+    data_2018 = data_2018.merge(data_grp, how='outer')
+    
+
+# Get counts in each lake buffer per month for 2018 water data and 2019 foot traffic
+path = f'{directory}*20_metro.zip'
+buffer = buffer2020
+data_2020 = pd.DataFrame({'NAME': buffer['NAME'], 'STATUS': water2020['status']} )
+
+
+for file in glob.glob(path):
+    sg_data = f'zip://{file}'
+    patterns = (gpd.read_file(sg_data)).to_crs('EPSG:26915')
+    data_join = gpd.sjoin(buffer, patterns, op='intersects')
+
+    # Get counts of points in each lake buffer.
+    data_grp = data_join.groupby('NAME', as_index=False)['index_right'].count()
+    data_grp = data_grp.rename(columns = {'index_right': f'{file[-15:-10]}_counts'})
+    
+    data_2020 = data_2020.merge(data_grp, how='outer')
+    
+    

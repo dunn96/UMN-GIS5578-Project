@@ -132,7 +132,7 @@ hydro_clean = hydro_lake.drop(["fw_id", "dowlknum", "sub_flag", "wb_class", "lak
                                "shape_Leng", "shape_Area", "INSIDE_X", "INSIDE_Y", "in_lakefin"], axis = 1)
 
 # New field for impairment status to be used when data is joined with the imparied data sets
-hydro_clean["status"] = ""
+hydro_clean["status"] = "Nonimpaired"
 
 # Dissolve hydrography geometry by lake name 
 hydro_clean = hydro_clean.rename(columns={'pw_basin_n': 'NAME'})
