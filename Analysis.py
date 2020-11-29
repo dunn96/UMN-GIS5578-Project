@@ -6,8 +6,6 @@ water2016 = gpd.read_file("water2016_clip.shp")
 water2018 = gpd.read_file("water2018_clip.shp")
 water2020 = gpd.read_file("water2020_clip.shp")
 
-# Get a user input for the size of the buffer
-buffer_size = int(input("Provide a distance for the size of the buffer in meters: "))
 
 def buffer_lakes(buffer, water_feat):
     ''' Buffer the clipped impaired water features.
@@ -69,7 +67,10 @@ def min_max(counts_df, year):
               f"\nTotal visits: {minimum['Total visits'][row]}"
               f"\nStatus: {minimum['STATUS'][row]}\n")
 
-        
+
+# Get a user input for the size of the buffer
+buffer_size = int(input("Provide a distance for the size of the buffer in meters: "))
+              
 # Calling the buffer_lakes function for each year of the impaired 
 # water datasets and assigning them to new variables
 buffer2014 = buffer_lakes(buffer_size, water2014)
