@@ -132,7 +132,7 @@ hydro_clean = hydro_lake.drop(["fw_id", "dowlknum", "sub_flag", "wb_class", "lak
                                "shape_Leng", "shape_Area", "INSIDE_X", "INSIDE_Y", "in_lakefin"], axis = 1)
 
 # New field for impairment status to be used when data is joined with the imparied data sets
-hydro_clean["status"] = "Nonimpaired"
+hydro_clean["status"] = ""
 
 # Dissolve hydrography geometry by lake name 
 hydro_clean = hydro_clean.rename(columns={'pw_basin_n': 'NAME'})
@@ -164,7 +164,7 @@ def complete_hydro(waterdata, waterdata_name):
                                    'status_y']]
     
     # Fill status of nonimpaired lakes
-    projected_dis['status_y'].fillna("nonimpaired")
+    projected_dis = projected_dis.fillna("nonimpaired")
     projected_df = projected_dis.rename(columns = {'status_y': 'status'})
 
     projected_df.to_file(f'{waterdata_name}.shp')

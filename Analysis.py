@@ -29,13 +29,53 @@ def buffer_lakes(buffer, water_feat):
     lake_buffer = lake_buffer[["NAME", "geometry"]]
     return lake_buffer
 
+
+# Counts of visitation for nonimpaired and impaired lakes 2020
+def vis_stats(counts_df):
+    '''
+    add documentation
+    '''
+    vis = counts_df.groupby(['STATUS']).sum()
+    lkcounts = counts_df.groupby(['STATUS'])['NAME'].count()
+
+    vis['avg monthly vis'] = vis.mean(axis=1)
+    vis['Lake Counts'] = lkcounts
+    vis['Total visits'] = (vis.sum(axis=1))
+    vis['Total visits'] = vis['Total visits'] - (vis['avg monthly vis'] + vis['Lake Counts'])
+    vis['Avg monthly vis per lake'] = vis['avg monthly vis'] / vis['Lake Counts']
+    vis['Avg yearly vis per lake'] = vis['Total visits'] / vis['Lake Counts']
+    vis.loc['Total vis per month']= vis.sum(axis=0)
+    return vis
+
+
+def min_max(counts_df, year):
+   '''
+   add documentation
+   '''
+    total = counts_df
+    total['Total visits'] = total.sum(axis=1)
+
+    maximum = total.sort_values(by=['Total visits'], ascending=False, ignore_index=True)
+    print(f'The top five most visted lakes for {year} are: ')
+    for row in range(len(maximum[0:5])):
+        print(f"Lake Name: {maximum['NAME'][row]}"
+              f"\nTotal visits: {maximum['Total visits'][row]}"
+              f"\nStatus: {maximum['STATUS'][row]}\n")
+
+    minimum = total.sort_values(by=['Total visits'], ascending=True, ignore_index=True)
+    print(f'The top five least visted lakes for {year} are: ')
+    for row in range(len(minimum[0:5])):
+        print(f"Lake Name: {minimum['NAME'][row]}"
+              f"\nTotal visits: {minimum['Total visits'][row]}"
+              f"\nStatus: {minimum['STATUS'][row]}\n")
+
+        
 # Calling the buffer_lakes function for each year of the impaired 
 # water datasets and assigning them to new variables
 buffer2014 = buffer_lakes(buffer_size, water2014)
 buffer2016 = buffer_lakes(buffer_size, water2016)
 buffer2018 = buffer_lakes(buffer_size, water2018)
 buffer2020 = buffer_lakes(buffer_size, water2020)
-
 
 
 # Get all metro data by finding all files ending in _metro.zip
@@ -75,4 +115,12 @@ for file in glob.glob(path):
     
     data_2020 = data_2020.merge(data_grp, how='outer')
     
-    
+ 
+
+# Counts of visitation for nonimpaired and impaired lakes for each year
+vis_stats(data_2018)
+vis_stats(data_2020)
+
+# Find most and least visited lake for each year
+min_max(data_2018, "2018")
+min_max(data_2020, "2020")
