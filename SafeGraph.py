@@ -15,10 +15,12 @@ import pandas as pd
 import arcpy 
 
 # Directory of unzipped safegraph patterns csv.gz files
-pathway = r'C:\Users\msong\Desktop\2019_safegraph2'
+data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
+#data_dir = r'F:\GIS Programming\2019_safegraph_all'
+#data_dir = r'C:\Users\msong\Desktop\alldata'
 
 # Extract data for MN and output csv for each dataset. 
-for file in glob.glob(pathway + '\*.csv.gz'): # search folder for all csv.gz files
+for file in glob.glob(data_dir + '\*.csv.gz'): # search folder for all csv.gz files
     with gzip.open(file, 'r') as data:
         reader = pd.read_csv(data)
     
@@ -58,7 +60,7 @@ def monthly(directory, month):
     '''
     
     df_list = []
-    for file in glob.glob(pathway + '\*.csv'):
+    for file in glob.glob(data_dir + '\*.csv'):
         if f'{file[-23:-18]}' == month: # outputs monYY
             reader = pd.read_csv(file)
             df_list.append(reader)
@@ -69,9 +71,12 @@ def monthly(directory, month):
     print(f'{month} data are combined')
     
 # create list of all months in year
-directory = r'F:\GIS Programming\2019_safegraph_all'
+#data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
+data_dir = r'F:\GIS Programming\2019_safegraph_all'
+#data_dir = r'C:\Users\msong\Desktop\alldata'
+
 months = []
-for file in glob.glob(directory + '\*.csv'):
+for file in glob.glob(data_dir + '\*.csv'):
     months.append(file[-23:-18])
 months = list(set(months)) # remove duplicates in list
 
@@ -83,9 +88,12 @@ for month in months:
     
 # Reduce statewide safegraph data to seven county metropolitan area MN
 
-metro_files = r'C:\Users\msong\Desktop\alldata'
-paths = []
+#data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
+#data_dir = r'F:\GIS Programming\2019_safegraph_all'
+data_dir = r'C:\Users\msong\Desktop\alldata'
 metro_dbf = r'C:\Users\msong\Desktop\shp_bdry_metro_counties_and_ctus\CountiesAndCTUs.dbf' 
+out_path = r'C:\Users\msong\Desktop\metro'
+paths = []
 
 # Extract List of cities in seven metropolitan counties
 cur = arcpy.SearchCursor(metro_dbf)
@@ -94,8 +102,7 @@ for row in cur:
     metro_cities.append(row.getValue('CTU_NAME'))
     
 # Reduce monthly safegraph data to cities in the metro
-out_path = r'C:\Users\msong\Desktop\metro'
-for file in glob.glob(metro_files + "\*.csv"):
+for file in glob.glob(data_dir + "\*.csv"):
     with open(file) as data: 
         reader = pd.read_csv(data)
         metro_df = reader.loc[reader['city'].isin(metro_cities)]
@@ -105,14 +112,13 @@ for file in glob.glob(metro_files + "\*.csv"):
         
 # Geocode SafeGraph POI in metro. Outpoint point features .shp files for each month.
 # Uses arcpy and Esri Business Anaylst US data geocoder
-inpath = r'C:\Users\leex6165\Desktop\metro'
 geocoder = r'\\files.umn.edu\us\gis\U-Spatial\UMN_Users\data\Esri Data\Esri BA USA 2019 geocoding data\USA.loc'
 address_fields = ('Address street_address VISIBLE NONE;City city VISIBLE NONE;Region region VISIBLE NONE;Postal postal_code VISIBLE NONE')
-outpath = r'C:\Users\leex6165\Desktop\geocoded'
+out = r'C:\Users\leex6165\Desktop\geocoded'
 
 # Get full path of each metro csv 
 tables = []
-for file in glob.glob(f'{inpath}\*.csv'):
+for file in glob.glob(f'{out_path}\*.csv'):
     tables.append(file)
     
 # Geocode safegraph poi into points based on multiple fields
@@ -121,7 +127,7 @@ for table in tables:
     arcpy.geocoding.GeocodeAddresses(table, 
                                      geocoder, 
                                      address_fields, 
-                                     f'{outpath}\\{table[32:-4]}.shp', 
+                                     f'{out}\\{table[32:-4]}.shp', 
                                      "STATIC", 
                                      None, 
                                      '', 
