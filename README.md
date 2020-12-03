@@ -1,4 +1,4 @@
-# GIS 5578 Foot Traffic and Water Quailty Analysis
+# Foot Traffic and Water Quailty Analysis
 
 ## Introductory information
 ### Contact
@@ -47,7 +47,7 @@
     * Source: DNR - https://gisdata.mn.gov/dataset/water-dnr-hydrography 
     * Format:Zipped Shapefile
     * Description: This is a polygon dataset representing the Minnesota surficial hydrology. 
-        * (Will be replaced by National Wetlands Inventory update (2009-2014) upon its completion in 2020)
+        * Will be replaced by National Wetlands Inventory update (2009-2014) upon its completion in 2020
 
 * apr19patterns-part1.csv.gz - SafeGraph Dataset
     * Source: SafeGraph
