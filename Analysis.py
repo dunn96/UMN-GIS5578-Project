@@ -119,8 +119,15 @@ for file in glob.glob(path):
  
 
 # Counts of visitation for nonimpaired and impaired lakes for each year
-vis_stats(data_2018)
-vis_stats(data_2020)
+# Write results to csv
+vis_2018 = vis_stats(data_2018)
+vis_2018.to_csv(f'{directory}/vis_stats2018_{buffer_size}m.csv', 
+                index=True)
+
+vis_2020 = vis_stats(data_2020)
+vis_2020.to_csv(f'{directory}/vis_stats2020_{buffer_size}m.csv', 
+                index=True)
+
 
 # Find most and least visited lake for each year
 min_max(data_2018, "2018")
