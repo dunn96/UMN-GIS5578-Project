@@ -1,3 +1,13 @@
+'''
+Nicole Dunn and Maisong Francis
+
+This script is designed to be used after WaterData.py and SafeGraph.py.
+This script buffers lake features based on user input and gets visitation counts
+within each lake buffer. The results are statistical outputs of visitation 
+counts per month and year for each category of impairment status: impaired and 
+nonimpaired, and returns top five most and least visited lakes for each year. 
+'''
+
 import geopandas as gpd
 
 # Load in all the clipped shapefiles
@@ -53,20 +63,26 @@ def min_max(counts_df, year):
     total = counts_df
     total['Total visits'] = total.sum(axis=1)
 
-    maximum = total.sort_values(by=['Total visits'], ascending=False, ignore_index=True)
+    maximum = total.sort_values(by=['Total visits'], 
+                                ascending=False, 
+                                ignore_index=True)
     print(f'The top five most visted lakes for {year} are: ')
     for row in range(len(maximum[0:5])):
         print(f"Lake Name: {maximum['NAME'][row]}"
               f"\nTotal visits: {maximum['Total visits'][row]}"
               f"\nStatus: {maximum['STATUS'][row]}\n")
 
-    minimum = total.sort_values(by=['Total visits'], ascending=True, ignore_index=True)
+    minimum = total.sort_values(by=['Total visits'], 
+                                ascending=True, 
+                                ignore_index=True)
+    
     print(f'The top five least visted lakes for {year} are: ')
     for row in range(len(minimum[0:5])):
         print(f"Lake Name: {minimum['NAME'][row]}"
               f"\nTotal visits: {minimum['Total visits'][row]}"
               f"\nStatus: {minimum['STATUS'][row]}\n")
-
+   
+##############################################################################
 
 # Get a user input for the size of the buffer
 buffer_size = int(input("Provide a distance for the size of the buffer in meters: "))
@@ -78,6 +94,8 @@ buffer2016 = buffer_lakes(buffer_size, water2016)
 buffer2018 = buffer_lakes(buffer_size, water2018)
 buffer2020 = buffer_lakes(buffer_size, water2020)
 
+
+##############################################################################
 
 # Get all metro data by finding all files ending in _metro.zip
 directory = r'/home/leex6165/gisproj/'
@@ -98,12 +116,14 @@ for file in glob.glob(path):
     
     data_2018 = data_2018.merge(data_grp, how='outer')
     
-
+    
+##############################################################################    
+    
 # Get counts in each lake buffer per month for 2018 water data and 2019 foot traffic
 path = f'{directory}*20_metro.zip'
 buffer = buffer2020
-data_2020 = pd.DataFrame({'NAME': buffer['NAME'], 'STATUS': water2020['status']} )
-
+data_2020 = pd.DataFrame({'NAME': buffer['NAME'], 
+                          'STATUS': water2020['status']} )
 
 for file in glob.glob(path):
     sg_data = f'zip://{file}'
@@ -116,7 +136,7 @@ for file in glob.glob(path):
     
     data_2020 = data_2020.merge(data_grp, how='outer')
     
- 
+############################################################################## 
 
 # Counts of visitation for nonimpaired and impaired lakes for each year
 # Write results to csv

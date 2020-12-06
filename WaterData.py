@@ -1,4 +1,6 @@
 '''
+Nicole Dunn and Maisong Francis
+
 This python script's purpose is to clean spatial data files that will be used in 
 future analysis. Cleaning the data includes clipping all the data to the 7 county metro as the area of interest, 
 removing fields that are not needed, removing invalid geometries from the geodataframes, 
