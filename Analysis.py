@@ -109,7 +109,44 @@ def min_max(counts_df, year):
         print(f"Lake Name: {minimum['NAME'][row]}"
               f"\nTotal visits: {minimum['Total visits'][row]}"
               f"\nStatus: {minimum['STATUS'][row]}\n")
-   
+
+    
+def impaired_change(y1_df, y1, y2_df, y2):
+    ''' Returns removed and added impaired lakes between two biennial 
+    impaired waters lists. 
+    
+    Parameters
+    ----------
+    y1_df: gpd DataFrame
+        The impaired waters clipped to study area and written out from 
+        WaterData.py and read with Geopandas.Must be the earlier year between 
+        two dataframes being compared. 
+    y1: str
+        Year of earlier dataset
+    y2_df:
+        The impaired waters clipped to study area and written out from 
+        WaterData.py and read with Geopandas. Must be the later year between 
+        two dataframes being compared. 
+    y2: str
+        Year of the later dataset
+    
+    Returns:
+    --------
+    str
+        The number of impaired lakes removed and added, and the names of those lakes. 
+    '''
+    
+    added = y2_df.loc[y2_df['AUID'].isin(y1_df['AUID']) == False]
+    removed = y1_df.loc[y1_df['AUID'].isin(y2_df['AUID']) == False]
+    
+    print(f"There were {len(removed['NAME'])} lakes removed from impaired waters list {y1}-{y2}:")
+    for row in removed['NAME']:
+        print (row)
+    
+    print(f"\nThere were {len(added['NAME'])} lakes added to impaired waters list {y1}-{y2}:")
+    for row in added['NAME']:
+        print(row)             
+        
 ##############################################################################
 
 # Get a user input for the size of the buffer
@@ -184,36 +221,9 @@ min_max(data_2020, "2020")
 ##############################################################################
 
 ### FINDING ADDED AND REMOVED LAKES BETWEEN EACH YEAR
-removed_14 = impaired2014.loc[impaired2014["AUID"].isin(impaired2016["AUID"]) == False]
-added_16 = impaired2016.loc[impaired2016["AUID"].isin(impaired2014["AUID"]) == False]
-removed_16 = impaired2016.loc[impaired2016["AUID"].isin(impaired2018["AUID"]) == False]
-added_18 = impaired2018.loc[impaired2018["AUID"].isin(impaired2016["AUID"]) == False]
-removed_18 = impaired2018.loc[impaired2018["AUID"].isin(impaired2020["AUID"]) == False]
-added_20 = impaired2020.loc[impaired2020["AUID"].isin(impaired2018["AUID"]) == False]
 
-print("From the years 2014-2016 the following lakes were removed from the impaired waters list:")
-for row in removed_14["NAME"]:
-    print(row)
-
-print("\nFrom the years 2014-2016 the following lakes were added to the impaired waters list:")
-for row in added_16["NAME"]:
-    print(row)
-    
-print("\nFrom the years 2016-2018 the following lakes were removed from the impaired waters list:")
-for row in removed_16["NAME"]:
-    print(row)
-
-print("\nFrom the years 2016-2018 the following lakes were added to the impaired waters list:")
-for row in added_18["NAME"]:
-    print(row)
-    
-print("\nFrom the years 2018-2020 the following lakes were removed from the impaired waters list:")
-for row in removed_18["NAME"]:
-    print(row)
-
-print("\nFrom the years 2018-2020 the following lakes were added to the impaired waters list:")
-for row in added_20["NAME"]:
-    print(row)
-    
+impaired_change(impaired2014, '2014', impaired2016, '2016')
+impaired_change(impaired2016, '2016', impaired2018, '2018')
+impaired_change(impaired2018, '2018', impaired2020, '2020')    
     
     
