@@ -38,11 +38,24 @@ def buffer_lakes(buffer, water_feat):
     return lake_buffer
 
 
-# Counts of visitation for nonimpaired and impaired lakes 2020
 def vis_stats(counts_df):
+    ''' Compute statistical metrics for visitations to impaired and nonimpaired 
+    lakes. Metrics include average month visits, lake counts, total visits, 
+    averae month visits per lake, average yearly visits per lake, and total visits
+    per year. 
+    
+    Parameter
+    ----------
+    counts_df: gpd DataFrame
+        The dataframe produced from spatial joining visitation counts to lake 
+        buffers.
+        
+    Return
+    ------
+    vis
+        gpd dataframe with statistical metrics
     '''
-    add documentation
-    '''
+    
     vis = counts_df.groupby(['STATUS']).sum()
     lkcounts = counts_df.groupby(['STATUS'])['NAME'].count()
 
@@ -52,14 +65,29 @@ def vis_stats(counts_df):
     vis['Total visits'] = vis['Total visits'] - (vis['avg monthly vis'] + vis['Lake Counts'])
     vis['Avg monthly vis per lake'] = vis['avg monthly vis'] / vis['Lake Counts']
     vis['Avg yearly vis per lake'] = vis['Total visits'] / vis['Lake Counts']
-    vis.loc['Total vis per month']= vis.sum(axis=0)
+    vis.loc['Total vis per year']= vis.sum(axis=0)
     return vis
 
 
 def min_max(counts_df, year):
+   ''' Returns most visited and least visted lakes with impairment status and 
+   visitation counts. 
+   
+   Parameters
+   ----------
+   counts_df: gpd DataFrame
+       The dataframe produced from spatial joining visitation counts to lake 
+       buffers.
+   year: str
+       The year of the impaired waters dataset
+       
+   Returns
+   -------
+   str
+       Printed names, impairment status, and visitation counts of top five most
+       and least visited lakes.
    '''
-   add documentation
-   '''
+    
     total = counts_df
     total['Total visits'] = total.sum(axis=1)
 
@@ -186,3 +214,6 @@ for row in removed_18["NAME"]:
 print("\nFrom the years 2018-2020 the following lakes were added to the impaired waters list:")
 for row in added_20["NAME"]:
     print(row)
+    
+    
+    
