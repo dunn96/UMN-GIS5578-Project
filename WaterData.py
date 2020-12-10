@@ -1,10 +1,11 @@
 '''
 Nicole Dunn and Maisong Francis
 
-This python script's purpose is to clean spatial data files that will be used in 
-future analysis. Cleaning the data includes clipping all the data to the 7 county metro as the area of interest, 
-removing fields that are not needed, removing invalid geometries from the geodataframes, 
-and adding geometery where there is none.
+This python script's purpose is to clean spatial data files 
+that will be used in future analysis. Cleaning the data includes 
+clipping all the data to the 7 county metro as the area of interest, 
+removing fields that are not needed, removing invalid geometries 
+from the geodataframes, and adding geometery where there is none.
 '''
 
 import pandas as pd
@@ -61,6 +62,11 @@ water2016_clip = gpd.clip(water2016_drop_invalid, metro_dissolve)
 water2014_proj = water2014_drop_invalid.to_crs('EPSG:26915')
 water2014_clip = gpd.clip(water2014_proj, metro_dissolve)
 
+# Writing impaired only shp
+water2018_clip.to_file("water2018_impaired.shp")
+water2016_clip.to_file("water2016_impaired.shp")
+water2014_clip.to_file("water2014_impaired.shp")
+
 ##############################################################################
 
 ### CLEANING THE 2020 IMPAIRED WATER DATA SET
@@ -86,6 +92,12 @@ water2020_metro["COUNTY"].unique()
 
 # Drop Duplicate AUIDs
 water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
+
+# Adding a status column to the dataframe
+water2020_clean["status"] = "Impaired"
+
+# Writing out to impaired to csv
+water2020_clean.to_file("water2020_impaired.csv")
 
 ##############################################################################
 
@@ -192,16 +204,7 @@ def complete_hydro(waterdata, waterdata_name):
 for df in dfs:
     for name in dfs_names:
         complete_hydro(df, name)
-
     
-##############################################################################
+# Joining geometry to impaired 2020 to create the complete dataset
+complete_hydro(water2020_clean, "water2020_clip")
 
-### JOINING GEOMETRY TO WATER2020_CLEAN
-
-water2020_join_auid = water2020_clean.merge(water2018_clip, how = "left", on = "AUID")
-
-water2020_join_auid = water2020_join_auid[["AUID", "NAME_x", "COUNTY_x", "AREA_ACRES", "geometry_y", "status"]]
-
-water2020_join_auid = water2020_join_auid.rename(columns = {"NAME_x" : "NAME", "COUNTY_x" : "COUNTY", "geometry_y" : "geometry"})
-
-complete_hydro(water2020_join_auid, "water2020_clip")

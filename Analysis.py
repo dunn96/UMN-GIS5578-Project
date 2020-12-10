@@ -152,3 +152,37 @@ vis_2020.to_csv(f'{directory}/vis_stats2020_{buffer_size}m.csv',
 # Find most and least visited lake for each year
 min_max(data_2018, "2018")
 min_max(data_2020, "2020")
+
+##############################################################################
+
+### FINDING ADDED AND REMOVED LAKES BETWEEN EACH YEAR
+removed_14 = impaired2014.loc[impaired2014["AUID"].isin(impaired2016["AUID"]) == False]
+added_16 = impaired2016.loc[impaired2016["AUID"].isin(impaired2014["AUID"]) == False]
+removed_16 = impaired2016.loc[impaired2016["AUID"].isin(impaired2018["AUID"]) == False]
+added_18 = impaired2018.loc[impaired2018["AUID"].isin(impaired2016["AUID"]) == False]
+removed_18 = impaired2018.loc[impaired2018["AUID"].isin(impaired2020["AUID"]) == False]
+added_20 = impaired2020.loc[impaired2020["AUID"].isin(impaired2018["AUID"]) == False]
+
+print("From the years 2014-2016 the following lakes were removed from the impaired waters list:")
+for row in removed_14["NAME"]:
+    print(row)
+
+print("\nFrom the years 2014-2016 the following lakes were added to the impaired waters list:")
+for row in added_16["NAME"]:
+    print(row)
+    
+print("\nFrom the years 2016-2018 the following lakes were removed from the impaired waters list:")
+for row in removed_16["NAME"]:
+    print(row)
+
+print("\nFrom the years 2016-2018 the following lakes were added to the impaired waters list:")
+for row in added_18["NAME"]:
+    print(row)
+    
+print("\nFrom the years 2018-2020 the following lakes were removed from the impaired waters list:")
+for row in removed_18["NAME"]:
+    print(row)
+
+print("\nFrom the years 2018-2020 the following lakes were added to the impaired waters list:")
+for row in added_20["NAME"]:
+    print(row)
