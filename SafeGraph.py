@@ -2,7 +2,7 @@
 Maisong Francis
 
 This script reduces tabular monthly SafeGraph patterns to the seven metropolitan counties in 
-Minnesota. The multiple SafeGraphfiles for each month are also reduced to schema of interest 
+Minnesota. The multiple SafeGraph files for each month are also reduced to schema of interest 
 through index and combined into one file per month. This script also geocodes the points of 
 interest within the seven metropolitan counties. 
 
@@ -13,33 +13,6 @@ import gzip
 import glob
 import pandas as pd
 import arcpy 
-
-# Directory of unzipped safegraph patterns csv.gz files
-data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
-#data_dir = r'F:\GIS Programming\2019_safegraph_all'
-#data_dir = r'C:\Users\msong\Desktop\alldata'
-
-# Extract data for MN and output csv for each dataset. 
-for file in glob.glob(data_dir + '\*.csv.gz'): # search folder for all csv.gz files
-    with gzip.open(file, 'r') as data:
-        reader = pd.read_csv(data)
-    
-        # Extract list of column names and create new data frame with fields of interest
-        all_col = []
-        for col in reader.head():
-            all_col.append(col)
-        
-        # fields of interest are first 12 fields for 2019, first 14 fields for 2020
-        ex_col = all_col[:11] 
-        df = reader.filter(ex_col)
- 
-        # Filter for MN data
-        mn_df = df.loc[df['region'] == 'MN']
-
-        # write to csv file
-        outname = file
-        mn_df.to_csv(f'{outname[:-7]}.csv', index=False)
-        
 
 
 def monthly(directory, month):
@@ -69,8 +42,39 @@ def monthly(directory, month):
     final_df = pd.concat(df_list)
     final_df.to_csv(f'{month}.csv', index=False)
     print(f'{month} data are combined')
+
+##############################################################################   
+
+# Directory of unzipped safegraph patterns csv.gz files
+data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
+#data_dir = r'F:\GIS Programming\2019_safegraph_all'
+#data_dir = r'C:\Users\msong\Desktop\alldata'
+
+# Extract data for MN and output csv for each dataset. 
+for file in glob.glob(data_dir + '\*.csv.gz'): # search folder for all csv.gz files
+    with gzip.open(file, 'r') as data:
+        reader = pd.read_csv(data)
     
-# create list of all months in year
+        # Extract list of column names and create new data frame with fields of interest
+        all_col = []
+        for col in reader.head():
+            all_col.append(col)
+        
+        # fields of interest are first 12 fields for 2019, first 14 fields for 2020
+        ex_col = all_col[:11] 
+        df = reader.filter(ex_col)
+ 
+        # Filter for MN data
+        mn_df = df.loc[df['region'] == 'MN']
+
+        # write to csv file
+        outname = file
+        mn_df.to_csv(f'{outname[:-7]}.csv', index=False)
+        
+##############################################################################
+    
+# Create list of all months in year
+
 #data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
 data_dir = r'F:\GIS Programming\2019_safegraph_all'
 #data_dir = r'C:\Users\msong\Desktop\alldata'
@@ -84,13 +88,14 @@ months = list(set(months)) # remove duplicates in list
 for month in months:
     monthly(directory, month)
 
-
+##############################################################################
     
 # Reduce statewide safegraph data to seven county metropolitan area MN
 
 #data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
 #data_dir = r'F:\GIS Programming\2019_safegraph_all'
 data_dir = r'C:\Users\msong\Desktop\alldata'
+
 metro_dbf = r'C:\Users\msong\Desktop\shp_bdry_metro_counties_and_ctus\CountiesAndCTUs.dbf' 
 out_path = r'C:\Users\msong\Desktop\metro'
 paths = []
@@ -108,13 +113,13 @@ for file in glob.glob(data_dir + "\*.csv"):
         metro_df = reader.loc[reader['city'].isin(metro_cities)]
         metro_df.to_csv(f'{out_path}/{file[-9:-4]}_metro.csv', index=False)
                 
-        
+##############################################################################        
         
 # Geocode SafeGraph POI in metro. Outpoint point features .shp files for each month.
 # Uses arcpy and Esri Business Anaylst US data geocoder
 geocoder = r'\\files.umn.edu\us\gis\U-Spatial\UMN_Users\data\Esri Data\Esri BA USA 2019 geocoding data\USA.loc'
 address_fields = ('Address street_address VISIBLE NONE;City city VISIBLE NONE;Region region VISIBLE NONE;Postal postal_code VISIBLE NONE')
-out = r'C:\Users\leex6165\Desktop\geocoded'
+out_path = r'C:\Users\leex6165\Desktop\geocoded'
 
 # Get full path of each metro csv 
 tables = []
@@ -127,7 +132,7 @@ for table in tables:
     arcpy.geocoding.GeocodeAddresses(table, 
                                      geocoder, 
                                      address_fields, 
-                                     f'{out}\\{table[32:-4]}.shp', 
+                                     f'{out_path}\\{table[32:-4]}.shp', 
                                      "STATIC", 
                                      None, 
                                      '', 
