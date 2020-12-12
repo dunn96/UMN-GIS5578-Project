@@ -16,6 +16,11 @@ water2016 = gpd.read_file("water2016_clip.shp")
 water2018 = gpd.read_file("water2018_clip.shp")
 water2020 = gpd.read_file("water2020_clip.shp")
 
+# Load in impaired only clipped files
+impaired2014 = gpd.read_file("water2014_impaired.shp")
+impaired2016 = gpd.read_file("water2016_impaired.shp")
+impaired2018 = gpd.read_file("water2018_impaired.shp")
+impaired2020 = pd.read_csv("water2020_impaired.csv")
 
 def buffer_lakes(buffer, water_feat):
     ''' Buffer the clipped impaired water features.

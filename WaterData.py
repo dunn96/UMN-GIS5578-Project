@@ -129,7 +129,7 @@ water2014_clip.to_file("water2014_impaired.shp")
 
 # Load water 2020 data csv, selecting out the columns that we want, adding a 
 # geometry column, and pulling out only the lake features.
-water2020 = gpd.read_file("wq-iw1-65.csv")
+water2020 = pd.read_csv("wq-iw1-65.csv")
 water2020 = water2020[["Water body name", "AUID", "County", "Water body type", "geometry"]]
 water2020_lake = water2020.loc[(water2020["Water body type"] == "Lake")]
 
@@ -153,7 +153,7 @@ water2020_clean = water2020_metro.drop_duplicates(subset = ["AUID"])
 water2020_clean["status"] = "Impaired"
 
 # Writing out to impaired to csv
-water2020_clean.to_file("water2020_impaired.csv")
+water2020_clean.to_csv("water2020_impaired.csv")
 
 ##############################################################################
 
