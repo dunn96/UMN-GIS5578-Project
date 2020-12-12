@@ -8,7 +8,9 @@ counts per month and year for each category of impairment status: impaired and
 nonimpaired, and returns top five most and least visited lakes for each year. 
 '''
 
+import pandas as pd 
 import geopandas as gpd
+import glob
 
 # Load in all the clipped shapefiles
 water2014 = gpd.read_file("water2014_clip.shp")
@@ -75,24 +77,23 @@ def vis_stats(counts_df):
 
 
 def min_max(counts_df, year):
-   ''' Returns most visited and least visted lakes with impairment status and 
-   visitation counts. 
+    '''Returns most visited and least visted lakes with impairment status and 
+    visitation counts. 
    
-   Parameters
-   ----------
-   counts_df: gpd DataFrame
+    Parameters
+    ----------
+    counts_df: gpd DataFrame
        The dataframe produced from spatial joining visitation counts to lake 
        buffers.
-   year: str
+    year: str
        The year of the impaired waters dataset
        
-   Returns
-   -------
-   str
+    Returns
+    -------
+    str
        Printed names, impairment status, and visitation counts of top five most
        and least visited lakes.
-   '''
-    
+    '''
     total = counts_df
     total['Total visits'] = total.sum(axis=1)
 
