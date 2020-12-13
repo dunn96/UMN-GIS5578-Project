@@ -27,10 +27,9 @@ def monthly(directory, month):
     directory: str
         Directory where csv files are
     month: str
-        First three characters of month and last two digits of year 
-        (i.e. jan20) for data to be combined
+        First three characters of month and last two digits of             year (i.e. jan20) for data to be combined
         
-    Returns
+    output
     -------
     csv
         Combined data for each month
