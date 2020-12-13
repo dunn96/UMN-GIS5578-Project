@@ -14,6 +14,10 @@ import glob
 import pandas as pd
 import arcpy 
 
+# Directory of unzipped safegraph patterns csv.gz files
+data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
+#data_dir = r'F:\GIS Programming\2019_safegraph_all'
+#data_dir = r'C:\Users\msong\Desktop\alldata'
 
 def monthly(directory, month):
     '''combine all SafeGraph data for each month into one csv
@@ -21,7 +25,7 @@ def monthly(directory, month):
     Parameters
     ----------
     directory: str
-        Directory of .csv files created from line 26
+        Directory where csv files are
     month: str
         First three characters of month and last two digits of year 
         (i.e. jan20) for data to be combined
@@ -35,34 +39,32 @@ def monthly(directory, month):
     df_list = []
     for file in glob.glob(data_dir + '\*.csv'):
         if f'{file[-23:-18]}' == month: # outputs monYY
-            reader = pd.read_csv(file)
-            df_list.append(reader)
-        else:
-            pass      
+            df = pd.read_csv(file)
+            df_list.append(df)
+        
     final_df = pd.concat(df_list)
     final_df.to_csv(f'{month}.csv', index=False)
     print(f'{month} data are combined')
 
 ##############################################################################   
-
-# Directory of unzipped safegraph patterns csv.gz files
-data_dir = r'C:\Users\msong\Desktop\2019_safegraph2'
-#data_dir = r'F:\GIS Programming\2019_safegraph_all'
-#data_dir = r'C:\Users\msong\Desktop\alldata'
+# Columns to keep from each dataset
+cols = ['safegraph_place_id', 
+        'location_name', 
+        'street_address', 
+        'city', 
+        'region',
+        'postal_code',
+        'brands',
+        'date_range_start',
+        'date_range_end',
+        'raw_visit_counts',
+        'raw_visitor_counts']
 
 # Extract data for MN and output csv for each dataset. 
-for file in glob.glob(data_dir + '\*.csv.gz'): # search folder for all csv.gz files
+for file in glob.glob(data_dir + r'\*.csv.gz'): # search folder for all csv.gz files
     with gzip.open(file, 'r') as data:
-        reader = pd.read_csv(data)
-    
-        # Extract list of column names and create new data frame with fields of interest
-        all_col = []
-        for col in reader.head():
-            all_col.append(col)
-        
-        # fields of interest are first 12 fields for 2019, first 14 fields for 2020
-        ex_col = all_col[:11] 
-        df = reader.filter(ex_col)
+        df = pd.read_csv(data, 
+                        usecols = cols)
  
         # Filter for MN data
         mn_df = df.loc[df['region'] == 'MN']
@@ -80,13 +82,13 @@ data_dir = r'F:\GIS Programming\2019_safegraph_all'
 #data_dir = r'C:\Users\msong\Desktop\alldata'
 
 months = []
-for file in glob.glob(data_dir + '\*.csv'):
+for file in glob.glob(data_dir + r'\*.csv'):
     months.append(file[-23:-18])
 months = list(set(months)) # remove duplicates in list
 
 # combine all monthly data for all months per year
 for month in months:
-    monthly(directory, month)
+    monthly(data_dir, month)
 
 ##############################################################################
     
@@ -101,16 +103,16 @@ out_path = r'C:\Users\msong\Desktop\metro'
 paths = []
 
 # Extract List of cities in seven metropolitan counties
-cur = arcpy.SearchCursor(metro_dbf)
+cur = arcpy.da.SearchCursor(metro_dbf)
 metro_cities = []
 for row in cur:
     metro_cities.append(row.getValue('CTU_NAME'))
     
 # Reduce monthly safegraph data to cities in the metro
-for file in glob.glob(data_dir + "\*.csv"):
+for file in glob.glob(data_dir + r"\*.csv"):
     with open(file) as data: 
-        reader = pd.read_csv(data)
-        metro_df = reader.loc[reader['city'].isin(metro_cities)]
+        df = pd.read_csv(data)
+        metro_df = df.loc[df['city'].isin(metro_cities)]
         metro_df.to_csv(f'{out_path}/{file[-9:-4]}_metro.csv', index=False)
                 
 ##############################################################################        
@@ -122,9 +124,7 @@ address_fields = ('Address street_address VISIBLE NONE;City city VISIBLE NONE;Re
 out_path = r'C:\Users\leex6165\Desktop\geocoded'
 
 # Get full path of each metro csv 
-tables = []
-for file in glob.glob(f'{out_path}\*.csv'):
-    tables.append(file)
+tables = glob.glob(f'{out_path}\*.csv')
     
 # Geocode safegraph poi into points based on multiple fields
 # Output is in format: monYY_metro.shp i.e. jan19_metro.shp
