@@ -5,12 +5,17 @@ This script is designed to be used after WaterData.py and SafeGraph.py.
 This script buffers lake features based on user input and gets visitation counts
 within each lake buffer. The results are statistical outputs of visitation 
 counts per month and year for each category of impairment status: impaired and 
-nonimpaired, and returns top five most and least visited lakes for each year. 
+nonimpaired, and prints top five most and least visited lakes for each year. 
+The script also prints the removed and added lakes between each biennial 
+impaired waters dataset. 
 '''
 
 import pandas as pd 
 import geopandas as gpd
-import glob
+from glob import glob
+
+
+directory = r'/home/leex6165/gisproj/'
 
 # Load in all the clipped shapefiles
 water2014 = gpd.read_file("water2014_clip.shp")
@@ -77,7 +82,7 @@ def vis_stats(counts_df):
 
 
 def min_max(counts_df, year):
-    '''Returns most visited and least visted lakes with impairment status and 
+    '''Prints most visited and least visted lakes with impairment status and 
     visitation counts. 
    
     Parameters
@@ -88,7 +93,7 @@ def min_max(counts_df, year):
     year: str
        The year of the impaired waters dataset
        
-    Returns
+    Prints
     -------
     str
        Printed names, impairment status, and visitation counts of top five most
@@ -118,7 +123,7 @@ def min_max(counts_df, year):
 
     
 def impaired_change(y1_df, y1, y2_df, y2):
-    ''' Returns removed and added impaired lakes between two biennial 
+    ''' Prints removed and added impaired lakes between two biennial 
     impaired waters lists. 
     
     Parameters
@@ -136,7 +141,7 @@ def impaired_change(y1_df, y1, y2_df, y2):
     y2: str
         Year of the later dataset
     
-    Returns:
+    Prints
     --------
     str
         The number of impaired lakes removed and added, and the names of those lakes. 
@@ -169,14 +174,13 @@ buffer2020 = buffer_lakes(buffer_size, water2020)
 ##############################################################################
 
 # Get all metro data by finding all files ending in _metro.zip
-directory = r'/home/leex6165/gisproj/'
 path = f'{directory}*19_metro.zip'
 
 buffer = buffer2018
 data_2018 = pd.DataFrame({'NAME': buffer['NAME'], 'STATUS': water2018['status']})
 
 # Get counts in each lake buffer per month for 2018 water data and 2019 foot traffic
-for file in glob.glob(path):
+for file in glob(path):
     sg_data = f'zip://{file}'
     patterns = (gpd.read_file(sg_data)).to_crs('EPSG:26915')
     data_join = gpd.sjoin(buffer, patterns, op='intersects')
@@ -196,7 +200,7 @@ buffer = buffer2020
 data_2020 = pd.DataFrame({'NAME': buffer['NAME'], 
                           'STATUS': water2020['status']} )
 
-for file in glob.glob(path):
+for file in glob(path):
     sg_data = f'zip://{file}'
     patterns = (gpd.read_file(sg_data)).to_crs('EPSG:26915')
     data_join = gpd.sjoin(buffer, patterns, op='intersects')
