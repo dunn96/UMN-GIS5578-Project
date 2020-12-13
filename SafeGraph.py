@@ -10,7 +10,7 @@ This tool requires the arcpy module and the business analyst extension to use th
 '''
 
 import gzip
-import glob
+from glob import glob
 import pandas as pd
 import arcpy 
 
@@ -36,7 +36,7 @@ def monthly(directory, month):
     '''
     
     df_list = []
-    for file in glob.glob(data_dir + '\*.csv'):
+    for file in glob(data_dir + r'\*.csv'):
         if f'{file[-23:-18]}' == month: # outputs monYY
             df = pd.read_csv(file)
             df_list.append(df)
@@ -60,7 +60,7 @@ cols = ['safegraph_place_id',
         'raw_visitor_counts']
 
 # Extract data for MN and output csv for each dataset. 
-for file in glob.glob(data_dir + r'\*.csv.gz'): # search folder for all csv.gz files
+for file in glob(data_dir + r'\*.csv.gz'): # search folder for all csv.gz files
     with gzip.open(file, 'r') as data:
         df = pd.read_csv(data, 
                         usecols = cols)
@@ -81,7 +81,7 @@ data_dir = r'F:\GIS Programming\2019_safegraph_all'
 #data_dir = r'C:\Users\msong\Desktop\alldata'
 
 months = []
-for file in glob.glob(data_dir + r'\*.csv'):
+for file in glob(data_dir + r'\*.csv'):
     months.append(file[-23:-18])
 months = list(set(months)) # remove duplicates in list
 
@@ -108,7 +108,7 @@ for row in cur:
     metro_cities.append(row.getValue('CTU_NAME'))
     
 # Reduce monthly safegraph data to cities in the metro
-for file in glob.glob(data_dir + r"\*.csv"):
+for file in glob(data_dir + r"\*.csv"):
     with open(file) as data: 
         df = pd.read_csv(data)
         metro_df = df.loc[df['city'].isin(metro_cities)]
@@ -123,7 +123,7 @@ address_fields = ('Address street_address VISIBLE NONE;City city VISIBLE NONE;Re
 out_path = r'C:\Users\leex6165\Desktop\geocoded'
 
 # Get full path of each metro csv 
-tables = glob.glob(f'{out_path}\*.csv')
+tables = glob(f'{out_path}\*.csv')
     
 # Geocode safegraph poi into points based on multiple fields
 # Output is in format: monYY_metro.shp i.e. jan19_metro.shp
