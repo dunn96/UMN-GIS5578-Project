@@ -19,12 +19,18 @@ def find_min(dfs):
     ---------
     dfs : list
         The dataframes of impaired water features
+        
+    Return
+    ------
+    minimum : str
+        smallest lake size of all input datasets
     '''
-    global minimum
+    
     minimum = []
     for df in dfs:
         minimum.append(df["AREA_ACRES"].min())
     minimum = min(minimum)
+    return minimum
     
     
 def complete_hydro(waterdata, waterdata_name):
@@ -39,6 +45,7 @@ def complete_hydro(waterdata, waterdata_name):
     waterdata_name: list
         A list of names for the impaired water files
     '''
+    
     # Combine nonimpaired with impaired. Returns a pandas dataframe
     join_hydro = hydro_dis.merge(waterdata, on ='NAME', how='left') 
     
