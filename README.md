@@ -64,7 +64,7 @@
 * Pandas, Geopandas, Glob, Gzip, Arcpy (Business analyst and spatial analyst extension)
 
 ## Methodological information / Usage
-This project contains 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
+   This project contains 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
 that will be used in future analysis. Cleaning the data includes clipping all the data to the seven county metro as 
 the area of interest, removing fields that are not needed, removing invalid geometries from the geodataframes, 
 and adding geometry where there is none. Thes second script (SafeGraph.py) reduces tabular monthly SafeGraph patterns 
