@@ -49,7 +49,7 @@
     * Description: This is a polygon dataset representing the Minnesota surficial hydrology. 
         * Will be replaced by National Wetlands Inventory update (2009-2014) upon its completion in 2020
 
-* <mmm><yy>patterns-part?.csv.gz
+* mmmyypatterns-part?.csv.gz
     * Source: SafeGraph
     * Format: csv.gz
     * Description: Foot traffic patterns for the United States. Collected from April 2019 through Sep 2020
