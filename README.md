@@ -9,7 +9,11 @@
 * Analysis.py
     * Format: Python file
     * Description: This script performs spatial analysis with the impaired water dataset and the SafeGraph and outputs statistical metrics. 
- 
+
+* Functions.py
+    * Format: Python file
+    * Description: This file contains the functions meant to be used within the Analysis.py script
+
 * Waterdata.py
     * Format: Python file
     * Description: This script manipulates and cleans the four impaired water datasets and the hydrography dataset and reduces them to the seven county metropolitan MN area using pandas and geopandas.
@@ -49,7 +53,7 @@
     * Description: This is a polygon dataset representing the Minnesota surficial hydrology. 
         * Will be replaced by National Wetlands Inventory update (2009-2014) upon its completion in 2020
 
-* <mmm><yy>patterns-part?.csv.gz
+* mmmyypatterns-part?.csv.gz
     * Source: SafeGraph
     * Format: csv.gz
     * Description: Foot traffic patterns for the United States. Collected from April 2019 through Sep 2020
@@ -60,9 +64,15 @@
 * Pandas, Geopandas, Glob, Gzip, Arcpy (Business analyst and spatial analyst extension)
 
 ## Methodological information / Usage
-Method description, links or references to publications or other documentation containing experimental design or protocols used in data collection
-Describe any quality-assurance procedures performed on the data
-Characterize low quality/questionable/outliers that people should be aware
- 
-Sharing and Access information
-Licenses or restrictions placed on the data (ArcPy)
+This project contain 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
+that will be used in future analysis. Cleaning the data includes clipping all the data to the seven county metro as 
+the area of interest, removing fields that are not needed, removing invalid geometries from the geodataframes, 
+and adding geometery where there is none. Thes second script (SafeGraph.py) reduces tabular monthly SafeGraph patterns 
+to the seven metropolitan counties in Minnesota. The multiple SafeGraph files for each month are also reduced to schema 
+of interest through index and combined into one file per month. This script also geocodes the points of interest within 
+the seven metropolitan counties. The thrid script (Analysis.py) This script is designed to be used after WaterData.py and 
+SafeGraph.py. This script buffers lake features based on user input and gets visitation counts within each lake buffer. 
+The results are statistical outputs of visitation counts per month and year for each category of impairment status: impaired and 
+nonimpaired, and prints top five most and least visited lakes for each year. The script also prints the removed and added 
+lakes between each biennial impaired waters dataset. The fourth script (Functions.py) contains the functions used within the 
+Analysis.py script and is imported as a module in the Analysis.py file.
