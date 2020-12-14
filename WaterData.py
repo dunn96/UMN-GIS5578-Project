@@ -11,6 +11,25 @@ from the geodataframes, and adding geometery where there is none.
 import pandas as pd
 import geopandas as gpd
 
+def count_invalid_geo(gdf):
+    '''Finds the invalid geometries in the water geodataframes
+    and counts them.
+    
+    Parameter
+    ---------
+    gdf : Geodataframe
+        The impaired lakes geodataframes and hydrography geodataframe
+    
+    Return
+    ------
+    invalid_count : int
+        The number of invalid geometries in the input geodataframe
+    '''
+    invalid_count = 0
+    for i in gdf.is_valid:
+        if i == False:
+            invalid_count += 1
+    return invalid_count
 
 def find_min(dfs):
     '''Finds the smallest lake within the impaired datasets
@@ -108,10 +127,13 @@ water2014 = water2014.rename(columns = {"WATER_NAME" : "NAME",
 
 ## Preping each dataframe for clippling
 # Locate all invalid gometries and drop them from the dataset
+print(f'{count_invalid_geo(water2018)} geometries will be dropped from this dataset')
 water2018_drop_invalid = water2018.loc[water2018['geometry'].is_valid, :]
 
+print(f'{count_invalid_geo(water2016)} geometries will be dropped from this dataset')
 water2016_drop_invalid = water2016.loc[water2016['geometry'].is_valid, :]
 
+print(f'{count_invalid_geo(water2014)} geometries will be dropped from this dataset')
 water2014_drop_invalid = water2014.loc[water2014['geometry'].is_valid, :]
 
 # Cleaning the metro dataset, dissolving on the county name
@@ -182,6 +204,7 @@ find_min(dfs)
 ### CLEANING THE HYDROGRAPHY DATA SET
 
 # Locate all invalid gometries and drop them from the dataset
+print(f'{count_invalid_geo(hydrography)} geometries will be dropped from this dataset')
 hydro_drop_invalid = hydrography.loc[hydrography['geometry'].is_valid, :]
 
 # Clipping hydro to the 7 county metro
