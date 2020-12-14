@@ -64,13 +64,13 @@
 * Pandas, Geopandas, Glob, Gzip, Arcpy (Business analyst and spatial analyst extension)
 
 ## Methodological information / Usage
-This project contain 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
+This project contains 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
 that will be used in future analysis. Cleaning the data includes clipping all the data to the seven county metro as 
 the area of interest, removing fields that are not needed, removing invalid geometries from the geodataframes, 
-and adding geometery where there is none. Thes second script (SafeGraph.py) reduces tabular monthly SafeGraph patterns 
+and adding geometry where there is none. Thes second script (SafeGraph.py) reduces tabular monthly SafeGraph patterns 
 to the seven metropolitan counties in Minnesota. The multiple SafeGraph files for each month are also reduced to schema 
 of interest through index and combined into one file per month. This script also geocodes the points of interest within 
-the seven metropolitan counties. The thrid script (Analysis.py) This script is designed to be used after WaterData.py and 
+the seven metropolitan counties. The third script (Analysis.py) This script is designed to be used after WaterData.py and 
 SafeGraph.py. This script buffers lake features based on user input and gets visitation counts within each lake buffer. 
 The results are statistical outputs of visitation counts per month and year for each category of impairment status: impaired and 
 nonimpaired, and prints top five most and least visited lakes for each year. The script also prints the removed and added 
