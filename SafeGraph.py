@@ -46,6 +46,7 @@ def monthly(directory, month):
     print(f'{month} data are combined')
 
 ##############################################################################   
+
 # Columns to keep from each dataset
 cols = ['safegraph_place_id', 
         'location_name', 
