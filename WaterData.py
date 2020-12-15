@@ -88,7 +88,8 @@ def complete_hydro(waterdata, waterdata_name):
 
     projected_df.to_file(f'{waterdata_name}.shp')
 
-    
+##############################################################################
+
 # Loading all shapefile datasets in as geopandas dataframes and assiging to variables
 hydrography = gpd.read_file("zip://shp_water_dnr_hydrography.zip")
 water2018 = gpd.read_file("zip://impaired_2018_lakes.zip")
