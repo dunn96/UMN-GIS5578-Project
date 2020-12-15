@@ -101,8 +101,7 @@ min_max(data_2020, "2020")
 
 ##############################################################################
 
-### FINDING ADDED AND REMOVED LAKES BETWEEN EACH YEAR
-
+# Finding added and removed lakes between each impaired dataset year
 impaired_change(impaired2014, '2014', impaired2016, '2016')
 impaired_change(impaired2016, '2016', impaired2018, '2018')
 impaired_change(impaired2018, '2018', impaired2020, '2020')    
