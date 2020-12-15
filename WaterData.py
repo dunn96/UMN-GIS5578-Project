@@ -8,7 +8,6 @@ removing fields that are not needed, removing invalid geometries
 from the geodataframes, and adding geometery where there is none.
 '''
 
-import pandas as pd
 import geopandas as gpd
 
 def count_invalid_geo(gdf):
