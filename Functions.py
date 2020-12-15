@@ -32,6 +32,7 @@ def buffer_lakes(buffer, water_feat):
     lake_buffer = lake_buffer[["NAME", "geometry"]]
     return lake_buffer
 
+##############################################################################
 
 def vis_stats(counts_df):
     ''' Compute statistical metrics for visitations to impaired and nonimpaired 
@@ -63,6 +64,7 @@ def vis_stats(counts_df):
     vis.loc['Total vis per year']= vis.sum(axis=0)
     return vis
 
+##############################################################################
 
 def min_max(counts_df, year):
     '''Prints most visited and least visted lakes with impairment status and 
@@ -104,7 +106,8 @@ def min_max(counts_df, year):
               f"\nTotal visits: {minimum['Total visits'][row]}"
               f"\nStatus: {minimum['STATUS'][row]}\n")
 
-    
+##############################################################################
+
 def impaired_change(y1_df, y1, y2_df, y2):
     ''' Prints removed and added impaired lakes between two biennial 
     impaired waters lists. 
