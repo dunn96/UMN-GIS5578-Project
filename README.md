@@ -56,7 +56,11 @@
 * mmmyypatterns-part?.csv.gz
     * Source: SafeGraph
     * Format: csv.gz
-    * Description: Foot traffic patterns for the United States. Collected from April 2019 through Sep 2020
+    * Description: Foot traffic patterns for the United States. Collected from apr19 through sep20. There are three-four files for each month     represented by '?' 
+    * Example: jan19patterns-part1.csv.gz
+    
+* spec-file.txt
+    * Description: Describes the Python environment. 
 
 ## Installation 
 * Used a combination of Jupyterlab and Jupyter Notebooks (with ArcPro)
@@ -64,7 +68,7 @@
 * Pandas, Geopandas, Glob, Gzip, Arcpy (Business analyst and spatial analyst extension)
 
 ## Methodological information / Usage
-   This project contains 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
+This project contains 4 scripts. The first script (WaterData.py) cleans spatial data files relating to the water data
 that will be used in future analysis. Cleaning the data includes clipping all the data to the seven county metro as 
 the area of interest, removing fields that are not needed, removing invalid geometries from the geodataframes, 
 and adding geometry where there is none. Thes second script (SafeGraph.py) reduces tabular monthly SafeGraph patterns 
